@@ -1,40 +1,31 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
-import {createUserWithEmailAndPassword,updateProfile} from 'firebase/auth';
-import Alert from '@mui/material/Alert';
- 
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import {auth} from '../firebase';
-const Signup = () => {
+import Alert from '@mui/material/Alert';
+import { Link } from 'react-router-dom';
+const Login= () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
     password: '',
   });
-
   const [error,setError]=useState('');
-  
-  
 
-  const handleSubmit =async (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    // Handle form submission
     try {
-    const userCredentials=await  createUserWithEmailAndPassword(auth,formData.email,formData.password);
-      const user=userCredentials.user;
-
-      updateProfile(user,{displayName:formData.name});
-      setFormData({
-        name:'',
-        email:'',
-        password:''
-      })
-
-      
-    } catch (error) {
-      setError(error.message);
-      console.log(error);
+        const userCredentials=await signInWithEmailAndPassword(auth,formData.email,formData.password);
+        const user=userCredentials.user;
+        console.log('login successful');
+    } catch (err) {
+        console.error(' Error: ', err)
+        setError(err.message);
+        
     }
+    
+
+
   };
 
   const handleChange = (e) => {
@@ -49,44 +40,22 @@ const Signup = () => {
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">
-            Create an account
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+            Login
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Already have an account?{' '}
-            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Sign in
-            </a>
+            New here?{' '}
+            <Link to={'/signup'} className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200">
+              Create an account
+            </Link>
           </p>
         </div>
 
         {/* Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            {/* Name Input */}
-            <div className="relative">
-              <label htmlFor="name" className="block text-left text-sm font-medium text-gray-700">
-                Full Name
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="John Doe"
-                  value={formData.name}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
+          <div className="space-y-4 rounded-md shadow-sm">
             {/* Email Input */}
-            <div className="relative">
+            <div>
               <label htmlFor="email" className="block text-left text-sm font-medium text-gray-700">
                 Email address
               </label>
@@ -98,8 +67,9 @@ const Signup = () => {
                   id="email"
                   name="email"
                   type="email"
+                  autoComplete="email"
                   required
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleChange}
@@ -108,7 +78,7 @@ const Signup = () => {
             </div>
 
             {/* Password Input */}
-            <div className="relative">
+            <div>
               <label htmlFor="password" className="block text-left text-sm font-medium text-gray-700">
                 Password
               </label>
@@ -120,8 +90,9 @@ const Signup = () => {
                   id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
                   required
-                  className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
@@ -141,33 +112,23 @@ const Signup = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
+        
+
           <div>
             <button
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
             >
-              Sign up
+              Sign in
             </button>
           </div>
+
           {error && 
           <Alert severity="error">{error}</Alert>}
-
-          {/* Terms and Privacy */}
-          <div className="text-center text-xs text-gray-600">
-            By signing up, you agree to our{' '}
-            <a href="#" className="text-indigo-600 hover:text-indigo-500">
-              Terms of Service
-            </a>{' '}
-            and{' '}
-            <a href="#" className="text-indigo-600 hover:text-indigo-500">
-              Privacy Policy
-            </a>
-          </div>
         </form>
       </div>
     </div>
   );
 };
 
-export default Signup;
+export default Login;
